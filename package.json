@@ -4,10 +4,15 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "be": "workspace:*",
+    "prisma": "^6.15.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "workspaces": ["fe", "be"]
+  "workspaces": ["fe", "be"],
+  "dependencies": {
+    "@prisma/client": "^6.15.0"
+  }
 }
