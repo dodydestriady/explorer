@@ -1,39 +1,46 @@
-import { faker } from "@faker-js/faker";
 import { prisma } from "../prisma/client";
 
 async function main() {
-  // Hapus data lama
   await prisma.file.deleteMany();
   await prisma.folder.deleteMany();
 
-  // Generate 5 root folders
-  for (let i = 0; i < 5; i++) {
-    const rootFolder = await prisma.folder.create({
-      data: {
-        name: faker.word.noun(),
-      },
+  async function createFolder(
+    name: string,
+    parentId: number | null,
+    level: number,
+    maxLevel: number
+  ) {
+    const folder = await prisma.folder.create({
+      data: { name, parentId },
     });
 
-    // Generate 3 subfolders tiap root
-    for (let j = 0; j < 3; j++) {
-      const subFolder = await prisma.folder.create({
+    for (let i = 1; i <= 2; i++) {
+      const savedName = `file ${name}-${i}-${i == maxLevel? 'empty' : ''}`
+      await prisma.file.create({
         data: {
-          name: faker.word.noun(),
-          parentId: rootFolder.id,
+          name: savedName,
+          folderId: folder.id,
+          extension: "txt",
         },
       });
-
-      // Generate 2 file tiap subfolder
-      for (let k = 0; k < 2; k++) {
-        await prisma.file.create({
-          data: {
-            name: faker.word.noun(),
-            folderId: subFolder.id,
-            extension: "txt",
-          },
-        });
-      }
     }
+
+    if (level >= maxLevel) return;
+
+    for (let i = 1; i <= 2; i++) {
+      await createFolder(`${name}-${i}`, folder.id, level + 1, maxLevel);
+    }
+
+    // Add empty folder
+    if (level % 3 === 0) {
+      await prisma.folder.create({
+        data: { name: `${name}-empty`, parentId: folder.id },
+      });
+    }
+  }
+
+  for (let r = 1; r <= 3; r++) {
+    await createFolder(`folder-${r}`, null, 1, 10);
   }
 
   console.log("Seeding done!");

@@ -1,8 +1,8 @@
 import { prisma } from "../prisma/client";
 
-export async function getFolders(req: any) {
+export async function getFolders(query: any) {
     const folders = await prisma.folder.findMany({
-        where: {parentId: null},
+        where: {parentId: Number(query.parent_id)},
         include: {children: true, files: true}
     })
 
