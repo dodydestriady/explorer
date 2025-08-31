@@ -1,15 +1,7 @@
 # explorer
 
 To install dependencies:
-
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.21. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+How to run
+1. copy .env.example .env
+2. docker-compose up --build
+3. access http://localhost:3000

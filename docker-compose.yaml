@@ -1,0 +1,39 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: explorer-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: explorer
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  be:
+    build:
+      context: .       
+      dockerfile: be/Dockerfile
+    container_name: explorer-be
+    env_file: .env
+    depends_on:
+      - db
+    ports:
+      - "${BE_PORT}:4000"
+    command: sh -c "bunx prisma migrate deploy && bun run src/scripts/seed.ts && bun run src/index.ts"
+  
+  fe:
+    build:
+      context: .       
+      dockerfile: fe/Dockerfile
+    container_name: explorer-fe
+    env_file: .env
+    depends_on:
+      - be
+    ports:
+      - "${FE_PORT}:3000"
+
+volumes:
+  db-data:
